@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IoT Innovate | Sense & Actuate Workshop</title>
+<meta name="description" content="Hands-on IoT workshop with ESP8266 and MicroPython at MGM University">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  :root {
+    --primary-orange: #d97941;
+    --dark-brown: #6b4423;
+    --light-bg: #f5f3ed;
+    --notebook-blue: #4a90e2;
+    --accent-red: #e74c3c;
+    --text-dark: #2c3e50;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--light-bg);
+    color: var(--text-dark);
+    overflow-x: hidden;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .notebook-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: #fafaf8;
+    pointer-events: none;
+  }
+
+  /* REDESIGNED HEADER - More compact */
+  .header {
+    background: rgba(255, 255, 255, 0.98);
+    border-bottom: 3px solid var(--primary-orange);
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .logo {
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--primary-orange);
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  /* REDESIGNED NAV - Compact grid layout */
+  .nav-links {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    max-width: 100%;
+  }
+
+  .nav-links a {
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 10px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: rgba(217, 121, 65, 0.05);
+    border: 1px solid rgba(217, 121, 65, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .nav-links a:active {
+    background: var(--primary-orange);
+    color: white;
+    transform: scale(0.95);
+  }
+
+  /* REDESIGNED HERO - More compact */
+  .hero {
+    padding: 20px 16px;
+    text-align: center;
+  }
+
+  .hero-content {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .hero h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+    color: var(--primary-orange);
+  }
+
+  .hero h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.3rem;
+    color: var(--dark-brown);
+    margin-bottom: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .sense-text {
+    color: var(--notebook-blue);
+  }
+
+  .actuate-text {
+    color: var(--accent-red);
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  /* REDESIGNED COUNTDOWN - Inline compact */
+  .countdown-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    margin: 16px 0;
+  }
+
+  .countdown-compact {
+    background: white;
+    border: 2px solid var(--notebook-blue);
+    border-radius: 10px;
+    padding: 12px 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .countdown-icon {
+    font-size: 1.2rem;
+  }
+
+  .countdown-content {
+    text-align: left;
+  }
+
+  .countdown-label {
+    font-size: 0.7rem;
+    color: var(--text-dark);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .countdown-timer {
+    font-family: 'Inter', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-orange);
+  }
+
+  /* REDESIGNED DEADLINE - Inline badge */
+  .deadline-badge {
+    background: var(--accent-red);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* CTA Buttons */
+  .cta-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 0 16px;
+  }
+
+  .btn {
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+    min-height: 50px;
+    transition: transform 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary-orange), var(--dark-brown));
+    color: white;
+    box-shadow: 0 4px 12px rgba(217, 121, 65, 0.3);
+  }
+
+  .btn-secondary {
+    background: white;
+    border: 2px solid var(--notebook-blue);
+    color: var(--notebook-blue);
+  }
+
+  /* Stats */
+  .stats-section {
+    padding: 30px 16px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .stat-card {
+    background: white;
+    border: 2px solid var(--primary-orange);
+    border-radius: 14px;
+    padding: 20px 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .stat-icon {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .stat-number {
+    font-family: 'Sora', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--primary-orange);
+    display: block;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    font-weight: 600;
+  }
+
+  /* Features */
+  .features-section {
+    padding: 40px 16px;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .section-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: white;
+    border: 2px solid var(--accent-red);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    color: var(--accent-red);
+  }
+
+  .section-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--dark-brown);
+    line-height: 1.2;
+  }
+
+  .section-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .feature-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 20px 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .feature-icon-box {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--primary-orange), var(--accent-red));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  .feature-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--dark-brown);
+  }
+
+  .feature-desc {
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    line-height: 1.5;
+  }
+
+  /* Schedule */
+  .schedule-section {
+    padding: 40px 16px;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .schedule-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .schedule-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .schedule-table-wrapper {
+    display: none;
+  }
+
+  .schedule-mobile {
+    display: block;
+  }
+
+  .schedule-card-mobile {
+    background: white;
+    border-left: 4px solid var(--notebook-blue);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .schedule-card-mobile.highlight {
+    border-left-color: var(--accent-red);
+    background: #fef2f2;
+  }
+
+  .mobile-time {
+    font-family: 'Inter', monospace;
+    font-weight: 700;
+    color: var(--notebook-blue);
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+  }
+
+  .mobile-activity {
+    font-weight: 700;
+    color: var(--dark-brown);
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+    line-height: 1.3;
+  }
+
+  .mobile-desc {
+    color: var(--text-dark);
+    margin-bottom: 6px;
+    line-height: 1.5;
+    font-size: 0.85rem;
+  }
+
+  /* Register */
+  .register-section {
+    padding: 40px 16px;
+    text-align: center;
+  }
+
+  .register-card {
+    background: white;
+    border: 3px solid var(--primary-orange);
+    border-radius: 20px;
+    padding: 28px 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .price-tag {
+    font-family: 'Sora', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary-orange);
+    margin: 16px 0;
+  }
+
+  .includes-list {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+
+  .include-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .include-icon {
+    font-size: 1.3rem;
+  }
+
+  .surprise-box {
+    background: linear-gradient(135deg, 
+      rgba(255, 107, 107, 0.1), 
+      rgba(255, 203, 112, 0.1));
+    border: 3px dashed var(--primary-orange);
+    border-radius: 14px;
+    padding: 20px 14px;
+    margin: 20px 0;
+    box-shadow: 0 4px 14px rgba(217, 121, 65, 0.15);
+  }
+
+  .surprise-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--primary-orange);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .surprise-subtitle {
+    font-size: 0.85rem;
+    color: var(--accent-red);
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .surprise-text {
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .surprise-text strong {
+    color: var(--primary-orange);
+  }
+
+  .mystery-emojis {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+    font-size: 1.4rem;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 32px 16px 16px;
+    background: var(--dark-brown);
+    color: white;
+  }
+
+  .footer-content {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .footer-section {
+    margin-bottom: 20px;
+  }
+
+  .footer-section h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: var(--primary-orange);
+    font-weight: 700;
+  }
+
+  .footer-section p {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+  }
+
+  .footer-bottom {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+  }
+
+  /* Scroll to Top */
+  .scroll-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    background: var(--primary-orange);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(217, 121, 65, 0.4);
+    z-index: 999;
+    border: 2px solid white;
+  }
+
+  .scroll-top:active {
+    transform: scale(0.9);
+  }
+
+  /* Desktop */
+  @media (min-width: 769px) {
+    .notebook-bg {
+      background: 
+        repeating-linear-gradient(
+          transparent,
+          transparent 31px,
+          rgba(74, 144, 226, 0.06) 31px,
+          rgba(74, 144, 226, 0.06) 32px
+        ),
+        linear-gradient(90deg, 
+          rgba(231, 76, 60, 0.08) 0px,
+          rgba(231, 76, 60, 0.08) 2px,
+          transparent 2px,
+          transparent 40px
+        ),
+        #fafaf8;
+    }
+
+    .header {
+      backdrop-filter: blur(12px);
+      padding: 15px 20px;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 2rem;
+      margin-bottom: 0;
+      text-align: left;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      grid-template-columns: unset;
+    }
+
+    .nav-links a {
+      font-size: 1rem;
+      padding: 12px 16px;
+      background: transparent;
+      border: none;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-orange);
+      background: rgba(217, 121, 65, 0.1);
+    }
+
+    .hero {
+      padding: 60px 20px 50px;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-size: 5rem;
+    }
+
+    .hero h2 {
+      font-size: 3.5rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.3rem;
+    }
+
+    .countdown-compact {
+      padding: 20px 32px;
+    }
+
+    .countdown-timer {
+      font-size: 2rem;
+    }
+
+    .cta-buttons {
+      flex-direction: row;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .btn {
+      width: auto;
+      padding: 18px 40px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      max-width: 1000px;
+    }
+
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      max-width: 1000px;
+    }
+
+    .schedule-mobile {
+      display: none;
+    }
+
+    .schedule-table-wrapper {
+      display: block;
+      background: white;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      border: 3px solid var(--primary-orange);
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .schedule-table th {
+      padding: 14px;
+      text-align: left;
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-orange), var(--dark-brown));
+      color: white;
+    }
+
+    .schedule-table td {
+      padding: 14px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .schedule-table tbody tr:hover {
+      background: rgba(74, 144, 226, 0.05);
+    }
+
+    .footer-content {
+      max-width: 1000px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      text-align: left;
+      gap: 32px;
+    }
+
+    .footer-section {
+      margin-bottom: 0;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="notebook-bg"></div>
+
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">IoT Innovate</div>
+      <nav class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#features">Why Join</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#register">Register</a>
+      </nav>
+    </div>
+  </header>
+
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h1>IoT Innovate</h1>
+      <h2><span class="sense-text">Sense</span> & <span class="actuate-text">Actuate</span></h2>
+
+      <p class="hero-subtitle">
+        Master IoT with MicroPython & ESP8266 in One Hands-On Day
+      </p>
+
+      <div class="countdown-inline">
+        <div class="countdown-compact">
+          <span class="countdown-icon">🚀</span>
+          <div class="countdown-content">
+            <div class="countdown-label">Starts In</div>
+            <div class="countdown-timer" id="countdown">Loading...</div>
+          </div>
+        </div>
+
+        <div class="deadline-badge">
+          <span>⏰</span>
+          <span>Last Date: Feb 5, 2026</span>
+        </div>
+      </div>
+
+      <div class="cta-buttons">
+        <button class="btn btn-primary" onclick="showRegistration()">
+          <span>🎯</span>
+          <span>Register Now</span>
+        </button>
+        <button class="btn btn-secondary" onclick="downloadBrochure()">
+          <span>📄</span>
+          <span>Download Brochure</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon">👥</span>
+        <span class="stat-number">40</span>
+        <span class="stat-label">Limited Seats</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-icon">⚡</span>
+        <span class="stat-number">8</span>
+        <span class="stat-label">Hours Training</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-icon">🎯</span>
+        <span class="stat-number">6</span>
+        <span class="stat-label">Live Projects</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-icon">💎</span>
+        <span class="stat-number">₹1K</span>
+        <span class="stat-label">All Inclusive</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="features-section">
+    <div class="section-header">
+      <div class="section-badge">⭐ Why Join Us</div>
+      <h2 class="section-title">Build Real IoT Projects</h2>
+      <p class="section-subtitle">
+        Hands-on learning with expert mentors and industry-standard tools
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon-box">🛠️</div>
+        <h3 class="feature-title">Professional Tools</h3>
+        <p class="feature-desc">ESP8266, MicroPython, Thonny IDE - complete IoT development environment</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">🎓</div>
+        <h3 class="feature-title">Expert Mentors</h3>
+        <p class="feature-desc">Learn from Dr. T.A. Prajapati and experienced BSc Robotics team</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">🚀</div>
+        <h3 class="feature-title">6 Live Projects</h3>
+        <p class="feature-desc">RGB LED control, I2C displays, ultrasonic sensors, smart lock systems & more</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">🔐</div>
+        <h3 class="feature-title">Smart Lock Security</h3>
+        <p class="feature-desc">Build password-protected access control with voice alerts and indicators</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">🌐</div>
+        <h3 class="feature-title">Web Integration</h3>
+        <p class="feature-desc">Create interactive web interfaces for your IoT devices</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">📜</div>
+        <h3 class="feature-title">Certificate</h3>
+        <p class="feature-desc">Official certificate of completion and comprehensive digital resources</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="schedule" class="schedule-section">
+    <div class="section-header">
+      <div class="section-badge">📅 Workshop Schedule</div>
+      <h2 class="section-title">Full Day Program</h2>
+      <p class="schedule-note">(Tentative)</p>
+    </div>
+
+    <div class="schedule-container">
+      <div class="schedule-table-wrapper">
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Activity</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mobile-time">09:30-10:00</td>
+              <td class="mobile-activity">Registration</td>
+              <td>Welcome & materials</td>
+            </tr>
+            <tr>
+              <td class="mobile-time">10:00-10:30</td>
+              <td class="mobile-activity">Guest Felicitation</td>
+              <td>Opening ceremony</td>
+            </tr>
+            <tr>
+              <td class="mobile-time">10:30-11:00</td>
+              <td class="mobile-activity">IoT Basics</td>
+              <td>ESP8266, Python, GPIO</td>
+            </tr>
+            <tr>
+              <td class="mobile-time">11:00-12:45</td>
+              <td class="mobile-activity">Sessions 1-3</td>
+              <td>RGB+Relay, Display, Sensor</td>
+            </tr>
+            <tr>
+              <td class="mobile-time">12:45-13:30</td>
+              <td class="mobile-activity">Lunch</td>
+              <td>Break & networking</td>
+            </tr>
+            <tr>
+              <td class="mobile-time">13:30-15:00</td>
+              <td class="mobile-activity">Mini Project</td>
+              <td>Distance Alert System</td>
+            </tr>
+            <tr>
+              <td class="mobile-time">15:00-16:15</td>
+              <td class="mobile-activity">Main Project</td>
+              <td>Smart Security System</td>
+            </tr>
+            <tr>
+              <td class="mobile-time">16:15-16:30</td>
+              <td class="mobile-activity">Break</td>
+              <td>Tea & snacks</td>
+            </tr>
+            <tr>
+              <td class="mobile-time">16:30-17:00</td>
+              <td class="mobile-activity">Wrap-up</td>
+              <td>Q&A & certificates</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="schedule-mobile">
+        <div class="schedule-card-mobile">
+          <div class="mobile-time">09:30-10:00 AM</div>
+          <div class="mobile-activity">Registration & Welcome</div>
+          <div class="mobile-desc">Materials distribution, welcome address</div>
+        </div>
+
+        <div class="schedule-card-mobile highlight">
+          <div class="mobile-time">10:00-10:30 AM</div>
+          <div class="mobile-activity">Guest Felicitation</div>
+          <div class="mobile-desc">Opening ceremony</div>
+        </div>
+
+        <div class="schedule-card-mobile">
+          <div class="mobile-time">10:30-11:00 AM</div>
+          <div class="mobile-activity">IoT & Python Basics</div>
+          <div class="mobile-desc">ESP8266, MicroPython, Thonny IDE, GPIO handling</div>
+        </div>
+
+        <div class="schedule-card-mobile">
+          <div class="mobile-time">11:00 AM-12:45 PM</div>
+          <div class="mobile-activity">Hands-on Sessions 1-3</div>
+          <div class="mobile-desc">RGB+Buzzer+Relay • I2C Display • Ultrasonic Sensor</div>
+        </div>
+
+        <div class="schedule-card-mobile highlight">
+          <div class="mobile-time">12:45-01:30 PM</div>
+          <div class="mobile-activity">Lunch Break</div>
+          <div class="mobile-desc">Networking and refreshments</div>
+        </div>
+
+        <div class="schedule-card-mobile">
+          <div class="mobile-time">01:30-03:00 PM</div>
+          <div class="mobile-activity">Mini Project</div>
+          <div class="mobile-desc">Smart Distance Measurement & Alert System</div>
+        </div>
+
+        <div class="schedule-card-mobile">
+          <div class="mobile-time">03:00-04:15 PM</div>
+          <div class="mobile-activity">Security System Project</div>
+          <div class="mobile-desc">Solenoid lock & password-protected access</div>
+        </div>
+
+        <div class="schedule-card-mobile highlight">
+          <div class="mobile-time">04:15-04:30 PM</div>
+          <div class="mobile-activity">Break</div>
+          <div class="mobile-desc">Coffee/Tea and networking</div>
+        </div>
+
+        <div class="schedule-card-mobile">
+          <div class="mobile-time">04:30-05:00 PM</div>
+          <div class="mobile-activity">Q&A & Wrap-up</div>
+          <div class="mobile-desc">Questions and certificates</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="register" class="register-section">
+    <div class="register-card">
+      <div class="section-badge">🎟️ Limited Seats</div>
+      <h2 class="section-title">Join The Workshop!</h2>
+
+      <div class="price-tag">₹1,000</div>
+
+      <div class="includes-list">
+        <div class="include-item">
+          <span class="include-icon">🍽️</span>
+          <span>Lunch</span>
+        </div>
+        <div class="include-item">
+          <span class="include-icon">📜</span>
+          <span>Certificate</span>
+        </div>
+        <div class="include-item">
+          <span class="include-icon">📚</span>
+          <span>Resources</span>
+        </div>
+      </div>
+
+      <div class="surprise-box">
+        <h3 class="surprise-title">🎊 Mystery Bonus 🎊</h3>
+        <p class="surprise-subtitle">Every Participant Gets...</p>
+        <p class="surprise-text">
+          An <strong>exclusive surprise gift pack</strong> to take home! 
+          What's inside? <strong>Join to discover!</strong> 🚀
+        </p>
+
+        <div class="mystery-emojis">
+          <span>📦</span>
+          <span>❓</span>
+          <span>🎉</span>
+          <span>💎</span>
+          <span>🔥</span>
+        </div>
+      </div>
+
+      <div class="cta-buttons">
+        <button class="btn btn-primary" onclick="showRegistration()">
+          <span>🎯</span>
+          <span>Register Now</span>
+        </button>
+      </div>
+
+      <p style="margin-top: 20px; color: var(--text-dark); font-size: 0.9rem; font-weight: 600;">
+        📞 Pranav: 9322059268<br>📞 Sahil: 7666002913
+      </p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>IoT Innovate</h3>
+        <p>Hands-on IoT learning</p>
+        <p>MGM University</p>
+      </div>
+
+      <div class="footer-section">
+        <h3>Contact</h3>
+        <p>📞 Pranav: 9322059268</p>
+        <p>📞 Sahil: 7666002913</p>
+        <p>👨‍🏫 Dr. T.A. Prajapati</p>
+      </div>
+
+      <div class="footer-section">
+        <h3>Location</h3>
+        <p>Dr. G.Y. Pathrikar College</p>
+        <p>CS & IT, MGM University</p>
+        <p>Chhatrapati Sambhajinagar</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 IoT Innovate</p>
+    </div>
+  </footer>
+
+  <div class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</div>
+
+  <script>
+    function updateCountdown() {
+      const eventDate = new Date('2025-09-15T09:30:00');
+      const now = new Date();
+      const diff = eventDate - now;
+
+      if (diff <= 0) {
+        document.getElementById('countdown').textContent = 'Live! 🎉';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / (1000 * 60)) % 60);
+      const secs = Math.floor((diff / 1000) % 60);
+
+      document.getElementById('countdown').innerHTML = 
+        `${days}d ${hours}h ${mins}m ${secs}s`;
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    let ticking = false;
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        window.requestAnimationFrame(function() {
+          const scrollTop = document.getElementById('scrollTop');
+          if (window.pageYOffset > 300) {
+            scrollTop.style.display = 'flex';
+          } else {
+            scrollTop.style.display = 'none';
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showRegistration() {
+      alert('🎯 Register Now!\n\nDeadline: February 5, 2026\n\nContact:\n📞 Pranav: 9322059268\n📞 Sahil: 7666002913\n\nFee: ₹1,000 (All Inclusive + Gift!)');
+    }
+
+    function downloadBrochure() {
+      alert('📄 Brochure\n\nContact:\n📞 Pranav: 9322059268\n📞 Sahil: 7666002913');
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
